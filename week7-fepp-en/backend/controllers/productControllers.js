@@ -1,7 +1,7 @@
 const Product = require("../models/productModel");
 const mongoose = require("mongoose");
 
-//GET / products;
+// GET /products
 const getAllProducts = async (req, res) => {
   try {
     const products = await Product.find({}).sort({ createdAt: -1 });
@@ -25,19 +25,68 @@ const createProduct = async (req, res) => {
 
 // GET /products/:productId
 const getProductById = async (req, res) => {
-  res.send("getProductById");
-};
-// DeLETE /products/:productId
-const deleteProduct = async (req, res) => {
-  res.send("deleteProduct");
+  const { productId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(productId)) {
+    return res.status(400).json({ message: "Invalid product ID" });
+  }
+
+  try {
+    const product = await Product.findById(productId);
+    if (product) {
+      res.status(200).json(product);
+    } else {
+      res.status(404).json({ message: "Product not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Failed to retrieve product" });
+  }
 };
 
-//update /products/:productId
+// PUT /products/:productId
 const updateProduct = async (req, res) => {
-  res.send("updateProduct");
+  const { productId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(productId)) {
+    return res.status(400).json({ message: "Invalid product ID" });
+  }
+
+  try {
+    const updatedProduct = await Product.findOneAndUpdate(
+      { _id: productId },
+      { ...req.body },
+      { new: true }
+    );
+
+    if (updatedProduct) {
+      res.status(200).json(updatedProduct);
+    } else {
+      res.status(404).json({ message: "Product not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Failed to update product" });
+  }
 };
 
+// DELETE /products/:productId
+const deleteProduct = async (req, res) => {
+  const { productId } = req.params;
 
+  if (!mongoose.Types.ObjectId.isValid(productId)) {
+    return res.status(400).json({ message: "Invalid product ID" });
+  }
+
+  try {
+    const deletedProduct = await Product.findOneAndDelete({ _id: productId });
+    if (deletedProduct) {
+      res.status(204).send(); // 204 No Content
+    } else {
+      res.status(404).json({ message: "Product not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete product" });
+  }
+};
 
 module.exports = {
   getAllProducts,
