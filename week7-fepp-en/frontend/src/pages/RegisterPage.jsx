@@ -11,7 +11,7 @@ const RegisterPage = ({ setIsAuthenticated }) => {
   const [dob, setDob]                   = useState("");
   const [membershipStatus, setMembershipStatus] = useState("basic");
 
-  // dùng hook ngắn
+ 
   const { signup, isLoading, error } = useSignup("/api/users/register");
   const navigate = useNavigate();
 

@@ -2,7 +2,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 
-// Helper tạo token
 const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
 };
@@ -21,7 +20,6 @@ const registerUser = async (req, res) => {
     membership_status,
   } = req.body;
 
-  // check đủ field theo schema
   if (
     !name ||
     !email ||
