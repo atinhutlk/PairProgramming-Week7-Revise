@@ -40,6 +40,7 @@ const EditProductPage = () => {
         setLoading(false);
       }
     };
+
     fetchProduct();
   }, [id]);
 
@@ -92,7 +93,6 @@ const EditProductPage = () => {
     <div className="create">
       <h2>Edit Product</h2>
       <form onSubmit={handleSubmit}>
-        {/* giống phần Add, nhưng dùng state hiện tại */}
         <label>Title:</label>
         <input
           value={title}
