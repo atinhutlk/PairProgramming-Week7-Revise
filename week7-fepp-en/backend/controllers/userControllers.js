@@ -1,7 +1,6 @@
-const User = require("../models/userModel");
-const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const User = require("../models/userModel");
 
 // Helper tạo token
 const generateToken = (userId) => {
@@ -147,44 +146,43 @@ const createUser = async (req, res) => {
 const getUserById = async (req, res) => {
   const { userId } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
-    return res.status(400).json({ message: "Invalid user ID" });
+  if (!name || !email || !password || !role || !address) {
+    return res.status(400).json({ message: "All fields are required" });
   }
 
   try {
-    const user = await User.findById(userId);
-    if (user) {
-      res.status(200).json(user);
-    } else {
-      res.status(404).json({ message: "User not found" });
+    const existing = await User.findOne({ email });
+    if (existing) {
+      return res.status(400).json({ message: "Email already in use" });
     }
-  } catch (error) {
-    res.status(500).json({ message: "Failed to retrieve user" });
-  }
-};
 
 // PUT /api/users/:userId
 const updateUser = async (req, res) => {
   const { userId } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
-    return res.status(400).json({ message: "Invalid user ID" });
-  }
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role,
+      address,
+    });
 
-  try {
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: userId },
-      { ...req.body },
-      { new: true }
-    );
+    const token = generateToken(user._id, user.role);
 
-    if (updatedUser) {
-      res.status(200).json(updatedUser);
-    } else {
-      res.status(404).json({ message: "User not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ message: "Failed to update user" });
+    res.status(201).json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        address: user.address,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to register user" });
   }
 };
 
@@ -192,8 +190,8 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
   const { userId } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
-    return res.status(400).json({ message: "Invalid user ID" });
+  if (!email || !password) {
+    return res.status(400).json({ message: "Email and password required" });
   }
 
   try {
@@ -203,8 +201,31 @@ const deleteUser = async (req, res) => {
     } else {
       res.status(404).json({ message: "User not found" });
     }
-  } catch (error) {
-    res.status(500).json({ message: "Failed to delete user" });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    user.lastLogin = new Date();
+    await user.save();
+
+    const token = generateToken(user._id, user.role);
+
+    res.status(200).json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        address: user.address,
+        lastLogin: user.lastLogin,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to login" });
   }
 };
 
