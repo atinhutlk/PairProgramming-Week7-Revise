@@ -31,6 +31,10 @@ const getUserById = async (req, res) => {
 const deleteUser = async (req, res) => {
   res.send("deleteUser");
 };
+//update /users/:userId
+const updateUser = async (req, res) => {
+  res.send("updateUser");
+};
 
 module.exports = {
   getAllUsers,

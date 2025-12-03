@@ -32,6 +32,11 @@ const deleteProduct = async (req, res) => {
   res.send("deleteProduct");
 };
 
+//update /products/:productId
+const updateProduct = async (req, res) => {
+  res.send("updateProduct");
+};
+
 
 
 module.exports = {
