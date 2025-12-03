@@ -39,7 +39,10 @@ const App = () => {
           }
         />
 
-        <Route path="/products/:id" element={<ProductPage />} />
+        <Route
+          path="/products/:id"
+          element={<ProductPage isAuthenticated={isAuthenticated} />}
+        />
 
         <Route
           path="/products/:id/edit"

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 
-const ProductPage = () => {
+const ProductPage = ({ isAuthenticated }) => {
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -22,6 +22,7 @@ const ProductPage = () => {
         setLoading(false);
       }
     };
+
     fetchProduct();
   }, [id]);
 
@@ -71,8 +72,12 @@ const ProductPage = () => {
         <p><span>Rating:</span> {product.supplier?.rating}</p>
       </div>
 
-      <button onClick={handleDelete}>Delete</button>{" "}
-      <Link to={`/products/${product._id}/edit`}>Edit</Link>
+       {isAuthenticated && (
+      <>
+        <button onClick={handleDelete}>Delete</button>{" "}
+        <Link to={`/products/${product._id}/edit`}>Edit</Link>
+      </>
+    )}
     </div>
   );
 };
