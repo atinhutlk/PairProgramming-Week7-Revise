@@ -34,9 +34,10 @@
   padding: 20px;
 }
 
-/* job previews / list */
+/* product / job previews / list */
 
-.job-list {
+.job-list,
+.product-list {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -44,7 +45,8 @@
   background-color: #f9f9f9;
 }
 
-.job-preview {
+.job-preview,
+.product-preview {
   padding: 15px;
   border: 1px solid #ddd;
   border-radius: 5px;
@@ -53,39 +55,56 @@
   transition: box-shadow 0.3s ease;
 }
 
-.job-preview:hover {
+.job-preview:hover,
+.product-preview:hover {
   box-shadow: 1px 3px 5px rgba(41, 20, 156, 0.1);
 }
 
-.job-preview h2 {
+.job-preview h2,
+.product-preview h2 {
   margin: 0 0 10px;
   font-size: 1.5em;
   color: #f1356d;
 }
 
-.job-preview p {
+.job-preview p,
+.product-preview p {
   margin: 5px 0;
   color: #666;
 }
 
-.job-preview p span {
+.job-preview p span,
+.product-preview p span {
   font-weight: bold;
 }
 
-.job-preview a{
+.job-preview a,
+.product-preview a {
   text-decoration: none;
 }
 
-/* job details page */
-.job-details h2 {
+/* product / job details page */
+.job-details,
+.product-details {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.job-details h2,
+.product-details h2 {
   font-size: 20px;
   color: #f1356d;
   margin-bottom: 10px;
 }
-.job-details div {
+
+.job-details div,
+.product-details div {
   margin: 20px 0;
 }
-.job-details button {
+
+.job-details button,
+.product-details button {
   background: #f1356d;
   color: #fff;
   border: 0;
@@ -94,25 +113,29 @@
   cursor: pointer;
 }
 
-/* create new job form */
+/* forms: create / edit / auth */
 .create {
   max-width: 400px;
-  margin: 0 auto;
-  text-align: center;
+  margin: 40px auto;
+  text-align: left;
 }
 .create label {
   text-align: left;
   display: block;
+  margin-top: 10px;
 }
 .create h2 {
   font-size: 20px;
   color: #f1356d;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
+  text-align: center;
 }
-.create input, .create textarea, .create select {
+.create input,
+.create textarea,
+.create select {
   width: 100%;
   padding: 6px 10px;
-  margin: 10px 0;
+  margin: 5px 0 10px;
   border: 1px solid #ddd;
   box-sizing: border-box;
   display: block;
@@ -121,7 +144,8 @@
   background: #f1356d;
   color: #fff;
   border: 0;
-  padding: 8px;
+  padding: 8px 16px;
   border-radius: 8px;
   cursor: pointer;
+  margin-top: 10px;
 }
