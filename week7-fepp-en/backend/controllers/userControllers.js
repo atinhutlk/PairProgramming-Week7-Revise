@@ -23,6 +23,15 @@ const createUser = async (req, res) => {
   }
 };
 
+// GET /users/:userId
+const getUserById = async (req, res) => {
+  res.send("getUserById");
+};
+// DeLETE /users/:userId
+const deleteUser = async (req, res) => {
+  res.send("deleteUser");
+};
+
 module.exports = {
   getAllUsers,
   getUserById,
