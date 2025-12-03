@@ -1,5 +1,7 @@
 const User = require("../models/userModel");
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 // GET /users
 const getAllUsers = async (req, res) => {
@@ -89,6 +91,8 @@ const deleteUser = async (req, res) => {
 };
 
 module.exports = {
+  registerUser,
+  loginUser,
   getAllUsers,
   getUserById,
   createUser,
