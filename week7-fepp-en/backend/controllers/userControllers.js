@@ -1,101 +1,98 @@
-const User = require("../models/userModel");
-const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const User = require("../models/userModel");
 
-// GET /users
-const getAllUsers = async (req, res) => {
-  try {
-    const users = await User.find({}).sort({ createdAt: -1 });
-    res.status(200).json(users);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to retrieve users" });
-  }
+const generateToken = (userId, role) => {
+  return jwt.sign({ userId, role }, process.env.JWT_SECRET, {
+    expiresIn: "7d",
+  });
 };
 
-// POST /users
-const createUser = async (req, res) => {
-  try {
-    const newUser = await User.create({ ...req.body });
-    res.status(201).json(newUser);
-  } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Failed to create user", error: error.message });
-  }
-};
+// POST /api/users/register
+const registerUser = async (req, res) => {
+  const { name, email, password, role, address } = req.body;
 
-// GET /users/:userId
-const getUserById = async (req, res) => {
-  const { userId } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
-    return res.status(400).json({ message: "Invalid user ID" });
+  if (!name || !email || !password || !role || !address) {
+    return res.status(400).json({ message: "All fields are required" });
   }
 
   try {
-    const user = await User.findById(userId);
-    if (user) {
-      res.status(200).json(user);
-    } else {
-      res.status(404).json({ message: "User not found" });
+    const existing = await User.findOne({ email });
+    if (existing) {
+      return res.status(400).json({ message: "Email already in use" });
     }
-  } catch (error) {
-    res.status(500).json({ message: "Failed to retrieve user" });
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role,
+      address,
+    });
+
+    const token = generateToken(user._id, user.role);
+
+    res.status(201).json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        address: user.address,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to register user" });
   }
 };
 
-// PUT /users/:userId
-const updateUser = async (req, res) => {
-  const { userId } = req.params;
+// POST /api/users/login
+const loginUser = async (req, res) => {
+  const { email, password } = req.body;
 
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
-    return res.status(400).json({ message: "Invalid user ID" });
+  if (!email || !password) {
+    return res.status(400).json({ message: "Email and password required" });
   }
 
   try {
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: userId },
-      { ...req.body },
-      { new: true }
-    );
-
-    if (updatedUser) {
-      res.status(200).json(updatedUser);
-    } else {
-      res.status(404).json({ message: "User not found" });
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: "Invalid credentials" });
     }
-  } catch (error) {
-    res.status(500).json({ message: "Failed to update user" });
-  }
-};
 
-// DELETE /users/:userId
-const deleteUser = async (req, res) => {
-  const { userId } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
-    return res.status(400).json({ message: "Invalid user ID" });
-  }
-
-  try {
-    const deletedUser = await User.findOneAndDelete({ _id: userId });
-    if (deletedUser) {
-      res.status(204).send(); // 204 No Content
-    } else {
-      res.status(404).json({ message: "User not found" });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid credentials" });
     }
-  } catch (error) {
-    res.status(500).json({ message: "Failed to delete user" });
+
+    user.lastLogin = new Date();
+    await user.save();
+
+    const token = generateToken(user._id, user.role);
+
+    res.status(200).json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        address: user.address,
+        lastLogin: user.lastLogin,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to login" });
   }
 };
 
 module.exports = {
   registerUser,
   loginUser,
-  getAllUsers,
-  getUserById,
-  createUser,
-  updateUser,
-  deleteUser,
 };
