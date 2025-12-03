@@ -3,15 +3,12 @@ import { useNavigate } from "react-router-dom";
 import useSignup from "../hooks/useSignup";
 
 const RegisterPage = ({ setIsAuthenticated }) => {
-  const [name, setName]                 = useState("");
-  const [email, setEmail]               = useState("");
-  const [password, setPassword]         = useState("");
-  const [phoneNumber, setPhoneNumber]   = useState("");
-  const [gender, setGender]             = useState("male");
-  const [dob, setDob]                   = useState("");
-  const [membershipStatus, setMembershipStatus] = useState("basic");
+  const [name, setName]         = useState("");
+  const [email, setEmail]       = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole]         = useState("Buyer"); // default
+  const [address, setAddress]   = useState("");
 
- 
   const { signup, isLoading, error } = useSignup("/api/users/register");
   const navigate = useNavigate();
 
@@ -22,18 +19,16 @@ const RegisterPage = ({ setIsAuthenticated }) => {
       name,
       email,
       password,
-      phone_number: phoneNumber,
-      gender,
-      date_of_birth: dob,
-      membership_status: membershipStatus,
+      role,     
+      address,  
     };
 
     const result = await signup(body);
 
     if (result.ok) {
-      setIsAuthenticated(true);      
-      alert("Register successful");  
-      navigate("/");                 
+      setIsAuthenticated(true);
+      alert("Register successful");
+      navigate("/");
     }
   };
 
@@ -64,42 +59,23 @@ const RegisterPage = ({ setIsAuthenticated }) => {
           required
         />
 
-        <label>Phone number:</label>
-        <input
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
-          required
-        />
-
-        <label>Gender:</label>
+        <label>Role:</label>
         <select
-          value={gender}
-          onChange={(e) => setGender(e.target.value)}
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
           required
         >
-          <option value="male">male</option>
-          <option value="female">female</option>
-          <option value="other">other</option>
+          <option value="Admin">Admin</option>
+          <option value="Seller">Seller</option>
+          <option value="Buyer">Buyer</option>
         </select>
 
-        <label>Date of birth:</label>
+        <label>Address:</label>
         <input
-          type="date"
-          value={dob}
-          onChange={(e) => setDob(e.target.value)}
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
           required
         />
-
-        <label>Membership status:</label>
-        <select
-          value={membershipStatus}
-          onChange={(e) => setMembershipStatus(e.target.value)}
-          required
-        >
-          <option value="basic">basic</option>
-          <option value="premium">premium</option>
-          <option value="vip">vip</option>
-        </select>
 
         {error && <p style={{ color: "red" }}>{error}</p>}
 
