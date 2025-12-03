@@ -23,6 +23,17 @@ const createProduct = async (req, res) => {
   }
 };
 
+// GET /products/:productId
+const getProductById = async (req, res) => {
+  res.send("getProductById");
+};
+// DeLETE /products/:productId
+const deleteProduct = async (req, res) => {
+  res.send("deleteProduct");
+};
+
+
+
 module.exports = {
   getAllProducts,
   getProductById,
